@@ -28,7 +28,6 @@
 </div>
 
 <div id='oldpostdiv'>
-    <?php $result = $this->blogdb->getpostlist(); ?>
     <table class='table-responsive table-striped'>
                 <thead>
                     <tr>
@@ -41,7 +40,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php $val = 0; foreach($result as $row): ?>
+                    <?php $val = 0; foreach($posts as $row): ?>
                     <tr data-id = "<?php echo $row->post_id;?>">
                         <td><?php echo ++$val?></td>
                         <td><?php echo $row->post_title;?></td>
@@ -53,6 +52,7 @@
                     <?php endforeach; ?>
                 </tbody>
             </table>
+    <ul class="page"><?php echo $pagination; ?></ul>
     
     <div class="alert alert-success fade in" style="display: none;" id="deletesuccess">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -114,3 +114,4 @@
   </div><!-- /.modal -->
   
 </div>
+

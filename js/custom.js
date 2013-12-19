@@ -72,8 +72,8 @@ $(document).ready(function() {
             
             $('.bootstrap-tagsinput').tagsinput(); //For tags
             
-            $("#psubmit").click(function(){ //Function when new post is being submitted
-                if(isBlank($(".nicEdit-main").text()) || isBlank($("#ptitle").val())){
+            $("#psubmit").click(function(e) { //Function when new post is being submitted
+                if (isBlank($(".nicEdit-main").text()) || isBlank($("#ptitle").val())) {
                     $('#tinymce1').popover('show');
                     setTimeout(function() {
                         $('#tinymce1').popover('destroy')
@@ -83,7 +83,7 @@ $(document).ready(function() {
                     e.preventDefault();
                 }
                 else
-                   $("#psubmit").submit(); 
+                    $("#psubmit").submit();
             });
         });
     });
@@ -118,23 +118,26 @@ $(document).ready(function() {
                 });
             });
             
-            $(".fa-edit").click(function() { //Post data getting function
-                x = $(this).parents("tr").attr("data-id"); //tr element, post id
-                y = $(this).parents("tr"); //tr element for removing or editing
-                $.post('backend/editpost',
-                        {
-                            "pid": x
-                        }, function(data) {
-                    console.log(data);
-                    var json = $.parseJSON(data);
-                    $("#etitle").val(json.edit_title);
-                    $(".nicEdit-main").html(json.edit_content);
-                    $("#ptags").tagsinput('add',json.edit_tags);
-                }
-                );
-            });
-            
-            $("#esubmit").click(function() { //Post edit function
+            function editclick() {  //Post data getting function
+                $(".fa-edit").click(function() {
+                    x = $(this).parents("tr").attr("data-id"); //tr element, post id
+                    y = $(this).parents("tr"); //tr element for removing or editing
+                    $.post('backend/editpost',
+                            {
+                                "pid": x
+                            }, function(data) {
+                        console.log(data);
+                        var json = $.parseJSON(data);
+                        $("#etitle").val(json.edit_title);
+                        $(".nicEdit-main").html(json.edit_content);
+                        $("#ptags").tagsinput('add', json.edit_tags);
+                    }
+                    );
+                });
+            }
+             
+            function deleteclick(){  //Post edit function
+            $("#esubmit").click(function() {
                 $.post('backend/editpost',
                         {
                             "post_id": x,
@@ -150,7 +153,26 @@ $(document).ready(function() {
                 }
                 );
             });
-
+            }
+            
+            editclick();
+            deleteclick();
+            
+            function pagination(){ //Pagination function
+            $(".page a").click(function(e) {
+                $.get($(this).attr('href'),function(data) {
+                            html = $.parseJSON(data);
+                            $("tbody").html(html.echo);
+                            $(".page").children().remove();
+                            $(".page").append(html.pagination);
+                            pagination();
+                            editclick();
+                            deleteclick();
+                        });
+                 e.preventDefault();
+                });
+        }
+        pagination();
             
         });
     });

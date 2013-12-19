@@ -9,8 +9,7 @@ class Backend extends CI_Controller{
     
     public function index(){
         if($this->session->userdata('username')){ //If username is set in session data
-            $posts = $this->blogdb->getpostlist(); //get post list from blogdb
-            $this->load->view('backend',$posts); //Load backend view and send post list
+            $this->load->view('backend'); //Load backend view
         }
     }
     
@@ -66,13 +65,59 @@ class Backend extends CI_Controller{
         echo "success";
         }
     }
+    
+    public function pagination($uri=''){ //Paginate backend posts
+        $this->load->library('pagination'); //Load pagination library
+        $config['base_url'] = base_url() . 'backend/pagination'; //Base url which is used on pagination
+        $config['total_rows'] = $this->blogdb->getpostrowcount();//Number of total rows of posts
+        $config['per_page'] = 5; // Row per page
+        $config['uri_segment'] = 3; //URI segment
+        $config['full_tag_open'] = '<ul class="pagination">'; 
+        $config['full_tag_close'] = '</ul>';
+        $config['first_tag_open'] = '<li>';
+        $config['first_tag_close'] = '</li>';
+        $config['last_tag_open'] = '<li>';
+        $config['last_tag_close'] = '</li>';
+        $config['prev_tag_open'] = '<li>';
+        $config['prev_tag_close'] = '</li>';
+        $config['next_tag_open'] = '<li>';
+        $config['next_tag_close'] = '</li>';
+        $config['cur_tag_open'] = '<li class="active"><a>';
+        $config['cur_tag_close'] = '</a></li>';
+        $config['num_tag_open'] = '<li>';
+        $config['num_tag_close'] = '</li>';
+        $this->pagination->initialize($config);
+        $data['pagination'] = $this->pagination->create_links();
+        $page = ($this->uri->segment(3) >0 ) ? $this->uri->segment(3) : 0;
+        $data['posts'] = $this->blogdb->getpostlist($this->pagination->per_page,$page); //Get post list
+            $val = ($this->uri->segment(3)) ? $this->uri->segment(3) : 0 ; //If there is no URI, set 0
+            $echo = "";
+            foreach($data['posts'] as $row): 
+            $echo .= "<tr data-id = '" . $row->post_id ."'>";
+            $echo .=  "<td>".++$val."</td>";
+            $echo .=  "<td>".$row->post_title."</td>";
+            $echo .=  "<td>".unix_to_human($row->post_time)."</td>";
+            $echo .=  "<td>".$this->blogdb->getlikecount($row->post_id)."</td>";
+            $echo .=  '<td><a data-toggle="modal" href="#editModal"><i class="fa fa-edit"></i></a></td>';
+            $echo .=  '<td><a data-toggle="modal" href="#deleteModal"><i class="fa fa-trash-o"></i></a></td>';
+            $echo .=  "</tr>";
+            endforeach;
+            if($uri != -1) //If not called from index functions
+            echo json_encode(array('pagination' => $data['pagination'], 'echo' => $echo)); //JSON encode the result and echo
+            else
+            return $data;
+        
+    }
+    
     public function backendc(){
-        $this->load->view('backendc');
+        $data = $this->pagination(-1);
+        $this->load->view('backendc',$data);
     }
     
     public function logout(){
         $this->session->sess_destroy();
     }
+    
 }
 
 ?>

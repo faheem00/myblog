@@ -65,8 +65,8 @@ class Blogdb extends CI_Model{
         }
         else return 0;
     }
-    public function getpostlist(){
-        $this->db->select('post_id,post_title,post_time')->from('posts')->where('users_user_id',$this->session->userdata('userid'));
+    public function getpostlist($limit,$offset){ //Get the list of posts for backend
+        $this->db->select('post_id,post_title,post_time')->from('posts')->where('users_user_id',$this->session->userdata('userid'))->limit($limit,$offset);
         $query = $this->db->get();
         return $query->result();
     }
@@ -106,6 +106,9 @@ class Blogdb extends CI_Model{
         $this->db->set(array('posts_post_id' => $post_id, 'like_ip_address' => $ipaddress));
         $this->db->insert('likes');
         return $this->getlikecount($post_id); //Return like count
+    }
+    public function getpostrowcount(){
+        return $this->db->count_all('posts');
     }
 }
 ?>

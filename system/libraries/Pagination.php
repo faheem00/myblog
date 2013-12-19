@@ -57,6 +57,7 @@ class CI_Pagination {
 	var $num_tag_close		= '';
 	var $page_query_string	= FALSE;
 	var $query_string_segment = 'per_page';
+	var $is_ajax_paging     = FALSE;
 	var $display_pages		= TRUE;
 	var $anchor_class		= '';
 
@@ -127,7 +128,7 @@ class CI_Pagination {
 		if ($num_pages == 1)
 		{
 			return '';
-		}
+		}		
 
 		// Set the base page index for starting page number
 		if ($this->use_page_numbers)
