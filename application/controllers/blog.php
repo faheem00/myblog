@@ -6,7 +6,8 @@ class Blog extends CI_Controller{
         $this->load->model('blogdb'); //load model
     }
     function index(){
-        $postlist['postdata'] = $this->blogdb->getpostnames(); //Get post list
+        $postlist['postdata'] = $this->blogdb->getpostnames($this->session->userdata('userid')); //Get post list
+        $postlist['username'] = $this->session->userdata('username');
         $this->load->view('blog',$postlist); //Load blog view, send post list
     }
     function getid(){ //Get post id
@@ -16,7 +17,7 @@ class Blog extends CI_Controller{
     }
     function insertlike(){
         if($this->input->post('post_id')){
-            $count = $this->blogdb->insertlike($this->input->post('post_id'),$this->session->userdata('ip_address'));
+            $count = $this->blogdb->insertlike($this->input->post('post_id'),$this->session->userdata('userid'));
             echo $count; //Count of likes
         }
     }
@@ -33,6 +34,7 @@ class Blog extends CI_Controller{
             $data['tags'] = $tags_name;
             $this->load->view('blogcontent',$data);
         }
+        else echo "<h1 class='text-center text-muted col-md-offset-4'>You have no posts yet</h1>";
     }
 }
 ?>

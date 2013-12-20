@@ -5,6 +5,7 @@
 
 //Backend JS
 
+
  $.ajaxSetup({
         data: {
             csrf_test_name: $.cookie('csrf_cookie_name')
@@ -41,14 +42,22 @@ $(document).ready(function() {
         //Initial load of backend
         $("#backend").load('backend/backendc #newpostdiv', function() {
         loadniceditor(1);
-
-        $('.bootstrap-tagsinput').tagsinput(); //For tags
-
+        
+        //For tags
+        $('.bootstrap-tagsinput').tagsinput();
+        
+        //For typeahead
+        $('input[placeholder=Tags]').typeahead({
+            name: 'tags',
+            prefetch: 'backend/typeahead',
+            limit: 10
+        });
+        
         $("#psubmit").click(function(e) { //Function when new post is being submitted
             if (isBlank($(".nicEdit-main").text()) || isBlank($("#ptitle").val())){
-                $('#tinymce1').popover('show');
+                $('#psubmit').popover('show');
                     setTimeout(function() {
-                        $('#tinymce1').popover('destroy')
+                        $('#psubmit').popover('destroy')
                     }
                     , 5000);         
                 //alert("There is no content in the text field or in the title field!");
@@ -70,7 +79,15 @@ $(document).ready(function() {
         $("#backend").load('backend/backendc #newpostdiv', function() {
             loadniceditor(1);
             
-            $('.bootstrap-tagsinput').tagsinput(); //For tags
+            //For tags
+            $('.bootstrap-tagsinput').tagsinput();
+
+            //For typeahead
+            $('input[placeholder=Tags]').typeahead({
+                name: 'tags',
+                prefetch: 'backend/typeahead',
+                limit: 10
+            });
             
             $("#psubmit").click(function(e) { //Function when new post is being submitted
                 if (isBlank($(".nicEdit-main").text()) || isBlank($("#ptitle").val())) {
@@ -99,6 +116,11 @@ $(document).ready(function() {
             $('.nicEdit-panelContain').parent().next().width('100%');
             $('.nicEdit-main').width('98%');
             $('.bootstrap-tagsinput').tagsinput();
+            $('input[placeholder=Tags]').typeahead({
+            name: 'tags',
+            prefetch: 'backend/typeahead',
+            limit: 10
+            });
             $(".fa-trash-o").click(function() { //Post delete function
                 x = $(this).parents("tr").attr("data-id"); //tr element, post id
                 y = $(this).parents("tr"); //tr element for removing or editing
@@ -173,6 +195,13 @@ $(document).ready(function() {
                 });
         }
         pagination();
+            
+        });
+    });
+    
+    //Loading other people's blog list after click
+    $("#viewotherblog").click(function(){
+        $("#backend").load('backend/otherblog #otherblogdiv', function(){
             
         });
     });

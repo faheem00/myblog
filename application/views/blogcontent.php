@@ -3,17 +3,20 @@
                     <br>
                     
                     <div class='postcontent'>
-                        <?php echo $post_content; ?>
+                        <?php if($post_content){
+                                echo $post_content;
+                                
+                        } ?>
                     </div> <!-- End of Main Post -->
                     
                     <div class='postinfo'>
                     <div class='row'>Posted on:&nbsp;&nbsp;&nbsp;<time class="posttime" data-livestamp="<?php echo $post_time; ?>"></time></div>
                     <div class='row'>Last Update on:&nbsp;&nbsp;&nbsp;<time class="posttime" data-livestamp="<?php echo $post_last_update_time; ?>"></time></div>
                     <div class='row'>Tags:
-                        <?php echo $tags; ?>
+                        <?php echo !empty($tags) ? $tags : "No tags"; ?>
                     </div>
                     <div class='row'><span class="postlike text-success"><?php echo $likecount;?></span> people like this</div>
-                    <?php if($this->blogdb->isliked($this->session->userdata('ip_address'),$post_id)){ ?>
+                    <?php if($this->blogdb->isliked($this->session->userdata('userid'),$post_id)){ ?>
                     <div class='row text-info'>Liked</div>
                     <?php }else{ ?>
                     <div class='row'>Like&nbsp;<a class="likebutton"><i class="fa fa-thumbs-up fa-2x"></i></a></div>

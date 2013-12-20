@@ -7,13 +7,13 @@
                         <input type="text" class="form-control" name="ptitle" id="ptitle" placeholder="Title">
                     </div>
                     <div class='form-group'>
-                        <textarea name="content" class="form-control" name="tinymce" id="tinymce1" data-animation="true" data-placement="auto" data-container="form" data-content="There is no content in the text field or in the title field!" style="width:100%">
+                        <textarea name="content" class="form-control" name="tinymce" id="tinymce1" style="width:100%">
                         </textarea>
                     </div>
                     <div class="form-group">
-                        <input type="text" class="form-control bootstrap-tagsinput" name="ptags" data-role="tagsinput" placeholder="Tags">
+                        <input type="text" class="form-control bootstrap-tagsinput" name="ptags" autocomplete="off" placeholder="Tags">
                     </div>
-                    <input type="submit" class='btn btn-primary' name="psubmit" id="psubmit" value="Submit now">
+                    <input type="submit" class='btn btn-primary' name="psubmit" id="psubmit" value="Submit now" data-animation="true" data-placement="bottom" data-container="form" data-content="There is no content in the text field or in the title field!" >
                 <?php echo form_close(); ?>
                     
                 <?php if ($this->session->userdata('postsubmitted')): ?>
@@ -23,11 +23,23 @@
                         </div>
                         <?php $this->session->unset_userdata('postsubmitted');
                     endif; ?>
+                    
+                 <?php if ($this->session->userdata('newregistered')): ?>
+                        <div class="alert alert-info fade in">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            Congratulations, you have been successfully registered! View "My Profile" section to edit your profile,
+                            "Create a post" to create a new post, or "View old posts" to edit or delete your existing posts. Happy Blogging!
+                        </div>
+                        <?php $this->session->unset_userdata('newregistered');
+                    endif;
+                    ?>   
+                    
                     </div>
             </div>
 </div>
 
 <div id='oldpostdiv'>
+    <?php if(!empty($posts)): ?>
     <table class='table-responsive table-striped'>
                 <thead>
                     <tr>
@@ -53,6 +65,9 @@
                 </tbody>
             </table>
     <ul class="page"><?php echo $pagination; ?></ul>
+    <?php else: ?>
+    <h1 class="text-center text-muted">You have no posts yet</h1>   
+    <?php endif; ?>
     
     <div class="alert alert-success fade in" style="display: none;" id="deletesuccess">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -62,9 +77,6 @@
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
         Your post has been successfully edited!
     </div>
-     <script>
-        
-    </script>
     
     <!-- Modal -->
   <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteLabel" aria-hidden="true">
@@ -115,3 +127,13 @@
   
 </div>
 
+<div id='otherblogdiv'>
+    <div class='text-center'>Here are the lists of other people's blogs</div>
+    <div class='text-center'>
+        <ul class='list-unstyled'>
+        <?php foreach($usernames as $row): ?>
+            <li><a href='<?=  site_url(); ?>viewblog/<?=$row->username; ?>'><?=$row->username; ?></a></li>
+        <?php endforeach; ?>
+        </ul>
+    </div>
+</div>

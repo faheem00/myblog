@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Faheem's Blog</title>
+        <title><?php echo $username ?>'s Blog</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" href="<?php echo base_url(); ?>css/bootstrap.css">
         <link rel="stylesheet" href="<?php echo base_url(); ?>css/font-awesome.css">
@@ -16,14 +16,15 @@
     <body>
         <header>
             <div class="text-center">Welcome to Faheem's Blog</div>
-            <div style="position:absolute;right:0;top:0;"><a href="backend" style="text-decoration: none;font-size: 1em;">View Backend</a></div>
+            <div style="position:absolute;right:0;top:0;"><a href="<?php echo site_url(); ?>backend" style="text-decoration: none;font-size: 1em;">View Backend</a></div>
+            <div style="position:absolute;right:0;top:20;"><a onclick="$.post('<?php echo site_url(); ?>backend/logout',function(){window.location.replace('<?php echo site_url(); ?>login');});" style="text-decoration: none;font-size: 1em;">Log Out</a></div>
         </header> <!-- End of Header -->
         <div class="container">
             <div class="row">
                 <div class="col-md-3" style='position: relative'>
                         <div class='row blogstack'>
-                            <?php foreach ($postdata as $datalist): ?>
-                            <a class='col-md-12' data-id="<?php echo $datalist->post_id; ?>"><?php echo $datalist->post_title; ?></a>
+                            <?php $postdata = array_reverse($postdata); foreach ($postdata as $datalist): ?>
+                            <a class='col-md-12' data-id="<?php echo $datalist->post_id;?>"><?php echo $datalist->post_title; ?></a>
                             <?php endforeach; ?>
                         </div>
                 </div> <!-- End of sidebar contents -->
@@ -38,14 +39,16 @@
         var disqus_shortname,disqus_identifier,disqus_url,dsq;
         $(document).ready(function() {  
         //Initial
+        
+        var firstid = $(".blogstack a:first").attr("data-id"); //Get first id of blog posts
         $(".blogstack a:first").addClass("active");
         function showblogpost(z,x){ //Passing post id to controller
-            $.post('blog/getid',
+            $.post('<?php echo site_url(); ?>blog/getid',
                     {
                         "post_id" : z
                     },
                     function(){
-                        $("#postbody").load('blog/showblogpost',function(){ //Load blog post    
+                        $("#postbody").load('<?php echo site_url(); ?>blog/showblogpost',function(){ //Load blog post                                                      
                          $("#loadcomments").click(function(){
                               if(x == "1" || typeof DISQUS == "undefined") {
                             /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
@@ -73,7 +76,7 @@
                             
                         $(".likebutton").click(function(){ //If like button is being clicked
                             id = $(".blogstack a[class='col-md-12 active']").attr("data-id");
-                                $.post('blog/insertlike',{
+                                $.post('<?php echo site_url(); ?>blog/insertlike',{
                                     'post_id' : id
                                 },function(data){
                                     $(".postlike").text(data);
@@ -88,8 +91,8 @@
                     });
         }
         
-        showblogpost($(".blogstack a:first").attr("data-id"),1); //Show the initial post
-        
+        showblogpost($(".blogstack a:first").attr("data-id"),firstid); //Show the initial post
+ 
         //After initial
         $(".blogstack a").click(function(){ //On clicking a post title
         if($(this).hasClass("active")) return; //If clicked on current post, do nothing.

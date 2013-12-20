@@ -40,6 +40,7 @@
 
 $route['default_controller'] = "login";
 $route['404_override'] = '';
+$route['viewblog/(:any)'] = 'viewblog/index/$1';
 
 
 /* End of file routes.php */

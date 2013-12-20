@@ -69,7 +69,7 @@ class Backend extends CI_Controller{
     public function pagination($uri=''){ //Paginate backend posts
         $this->load->library('pagination'); //Load pagination library
         $config['base_url'] = base_url() . 'backend/pagination'; //Base url which is used on pagination
-        $config['total_rows'] = $this->blogdb->getpostrowcount();//Number of total rows of posts
+        $config['total_rows'] = $this->blogdb->getpostrowcount($this->session->userdata('userid'));//Number of total rows of posts
         $config['per_page'] = 5; // Row per page
         $config['uri_segment'] = 3; //URI segment
         $config['full_tag_open'] = '<ul class="pagination">'; 
@@ -89,7 +89,7 @@ class Backend extends CI_Controller{
         $this->pagination->initialize($config);
         $data['pagination'] = $this->pagination->create_links();
         $page = ($this->uri->segment(3) >0 ) ? $this->uri->segment(3) : 0;
-        $data['posts'] = $this->blogdb->getpostlist($this->pagination->per_page,$page); //Get post list
+        $data['posts'] = $this->blogdb->getpostlist($this->pagination->per_page,$page,$this->session->userdata('userid')); //Get post list
             $val = ($this->uri->segment(3)) ? $this->uri->segment(3) : 0 ; //If there is no URI, set 0
             $echo = "";
             foreach($data['posts'] as $row): 
@@ -114,8 +114,23 @@ class Backend extends CI_Controller{
         $this->load->view('backendc',$data);
     }
     
+    //Function for displaying other people's blogs
+    public function otherblog(){
+        $data['usernames'] = $this->blogdb->getusernames($this->session->userdata('userid'));
+        $this->load->view('backendc',$data);
+    }
     public function logout(){
         $this->session->sess_destroy();
+    }
+    
+    //Function for returning typeahead objects
+    public function typeahead(){
+        $tags_array = $this->blogdb->gettags(0);
+        $tags = array();
+        foreach ($tags_array as $tags_row) {
+            $tags[] = $tags_row->tag_name;
+        }
+        echo json_encode($tags);
     }
     
 }

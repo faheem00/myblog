@@ -9,6 +9,12 @@
 
 root { 
     display: block;
+    margin: 0px 0px;
+    padding: 0px 0px;
+}
+
+body{
+    height: max-content;
 }
 
 a{
@@ -51,4 +57,16 @@ header > div{
 
 td,th{
     padding:2px 10px;
+}
+
+/*Fixing typeahead issues */
+
+.bootstrap-tagsinput{
+    position: relative;
+}
+
+/*Fixing bootstrap centering issue */
+.center-block {
+    float: none;
+    vertical-align: middle;
 }
