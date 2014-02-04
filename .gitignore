@@ -13,10 +13,12 @@ application/logs/*
 /myblog.mwb.bak
 /application/models/index.html
 /application/views/index.html
+/user_guide
 =======
 */config/development
 */logs/log-*.php
 */logs/!index.html
 */cache/*
 */cache/!index.html
+
 >>>>>>> 5c047c32642c1eefd602cee1fdec0a2e79915571

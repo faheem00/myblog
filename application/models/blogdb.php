@@ -131,8 +131,64 @@ class Blogdb extends CI_Model{
     }
     public function getusernames($id){
         $this->db->where('user_id !=', $id);
-        $query = $this->db->get('users');
+        $this->db->where('enable_profile_view', '1');
+        $this->db->where('`user_id` = `users_user_id');
+        $query = $this->db->get('users,user_profiles');
         return $query->result();
+    }
+    public function getpermission($id){
+        $query = $this->db->get_where('user_profiles',array('users_user_id' => $id, 'enable_profile_view' => '1'));
+        if($query->num_rows() > 0) return true;
+        else return false;
+    }
+    public function getprofiledata(){
+        $this->db->join('users','users.user_id = user_profiles.users_user_id');
+        $query = $this->db->get_where('user_profiles',array('users_user_id' => $this->session->userdata('userid')));
+        if($query->num_rows() > 0){
+            $data['username'] = $query->row()->username;
+            $data['fullname'] = $query->row()->full_name;
+            if(isset($query->row()->dob))$data['dob'] = $query->row()->dob;
+            $data['gender'] = $query->row()->gender;
+            $data['description'] = $query->row()->description;
+            $data['address'] = $query->row()->address;
+            $data['enable_profile_view'] = $query->row()->enable_profile_view ? true:false;
+            $data['profile_picture_string'] = $query->row()->profile_picture_string;
+            $data['email'] = $query->row()->email;
+            return $data;
+        }
+        else return false;
+    }
+    public function setprofiledata($cname,$cvalue){  //Column name, Column value
+        //$this->db->join('users','users.user_id = user_profiles.users_user_id');
+       // $this->db->select('*')->from('user_profiles')->join('users','users.user_id = user_profiles.users_user_id')->where(array('user_profiles.users_user_id' => $this->session->userdata('userid'),$cname => $cvalue));
+        //$query = $this->db->get();
+        if($cname == 'username' || $cname == 'email'){
+        $this->db->where('user_id',$this->session->userdata('userid'));
+        $this->db->update('users',array($cname => $cvalue));
+        if($cname == 'username') $this->session->set_userdata('username',$cvalue);
+        }
+        else{
+        $this->db->where('users_user_id',$this->session->userdata('userid'));
+        $this->db->update('user_profiles',array($cname => $cvalue));
+        }
+        $data = json_encode(array('echo' => 'true','value' => $cvalue));
+        return $data;
+    }
+    public function setprofilepic($data){
+        $query = $this->db->get_where('user_profiles',array('profile_picture_string' => $data['file_string']));
+        if($query->num_rows()> 0){
+            $this->load->helper('string');
+            $data['file_string'] = random_string('unique');
+        }
+        $this->db->where('users_user_id',$this->session->userdata('userid'));
+        $this->db->update('user_profiles',array('profile_picture_path' => $data['upload_path'] . $data['file_name'],'profile_picture_string' => $data['file_string']));
+    }
+    public function getprofilepic($id){
+        $query = $this->db->get_where('user_profiles',array('profile_picture_string' => $id));
+        if($query->num_rows()> 0){
+            return $query->row()->profile_picture_path;
+        }
+        else return NULL;
     }
 }
 ?>

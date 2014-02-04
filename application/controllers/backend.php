@@ -119,6 +119,19 @@ class Backend extends CI_Controller{
         $data['usernames'] = $this->blogdb->getusernames($this->session->userdata('userid'));
         $this->load->view('backendc',$data);
     }
+    
+    
+    public function editprofile(){
+        $data = $this->getprofiledata();
+        $this->load->view('backendc',$data);
+    }
+    
+    //Function for getting profile data
+    public function getprofiledata(){
+        $data = $this->blogdb->getprofiledata();
+        return $data;
+    }
+    
     public function logout(){
         $this->session->sess_destroy();
     }
@@ -133,6 +146,99 @@ class Backend extends CI_Controller{
         echo json_encode($tags);
     }
     
+    //Function for setting profile data
+    public function setprofiledata(){
+        if($this->input->post('fieldname')){
+            switch($this->input->post('fieldname')){
+                case 'username':
+                    echo $this->blogdb->setprofiledata('username',$this->input->post('value'));
+                    break;
+                case 'fullname':
+                    echo $this->blogdb->setprofiledata('full_name',$this->input->post('value'));
+                    break;
+                case 'email':
+                    echo $this->blogdb->setprofiledata('email',$this->input->post('value'));
+                    break;
+                case 'gender':
+                    echo $this->blogdb->setprofiledata('gender',$this->input->post('value'));
+                    break;
+                case 'dob':
+                    $date = date('Y-m-d',strtotime($this->input->post('value')));
+                    echo $this->blogdb->setprofiledata('dob',$date);
+                    break;
+                case 'bio':
+                    echo $this->blogdb->setprofiledata('description',$this->input->post('value'));
+                    break;
+                case 'profileview':
+                    if($this->input->post('value') == "false")
+                    $value = 0;
+                    else $value = 1;
+                    echo $this->blogdb->setprofiledata('enable_profile_view',$value);
+            }
+        }
+    }
+    
+    //Function for checking validity of edited username and email
+    public function checkexist(){
+        if($this->input->get('field') == 'editusername'){
+            echo json_encode(
+                    array(
+                        "value" => $this->input->get('value'),
+                        "valid" => $this->blogdb->checkuserexist($this->input->get('value')),
+                        "message" => "User already exists"
+            ));
+        }
+        else if($this->input->get('field') == 'editemail'){
+            echo json_encode(
+                array(
+                "value" => $this->input->get('value'),
+                "valid" => $this->blogdb->checkemailexist($this->input->get('value')),
+                "message" => "Email already exists"
+                ));
+        }
+        }
+        
+     //Function for uploading file
+     function uploadpic() {  
+        $this->load->helper('string');
+        $config['upload_path'] = './images/' . $this->blogdb->getuserid($this->session->userdata('username')) . '/';
+        if (!file_exists($config['upload_path'])) {
+            mkdir($config['upload_path'], 0777, true);
+        }
+        $config['allowed_types'] = 'gif|jpg|png';
+        $config['max_size'] = '1024';
+        $config['file_name'] = $this->blogdb->getuserid($this->session->userdata('username')) . "_" . time();
+        $config['file_string'] = random_string('unique');
+
+        $this->load->library('upload', $config);
+
+        if (!$this->upload->do_upload('profilepic')) {
+            $error = json_encode(array('success' => false, 'msg' => $this->upload->display_errors()));
+            echo $error;
+        } else {
+            $config['upload_path'] = $config['upload_path'];
+            $config['file_name'] = $this->upload->data()['file_name'];
+            $this->blogdb->setprofilepic($config);
+            $data = json_encode(array('success' => true, 'file_link' => '/backend/image?id=' .  $config['file_string']));
+            echo $data;
+        }
+    }
+    
+    //Function for loading a pic anonymously
+    function image(){
+        if($this->input->get('id') == 'placeholder'){
+            $this->load->helper('file');
+            $image_path = './images/placeholder.jpg';
+            $this->output->set_content_type(get_mime_by_extension($image_path));
+            $this->output->set_output(file_get_contents($image_path));
+        }
+        else if($this->input->get('id')){
+            $this->load->helper('file');
+            $image_path = $this->blogdb->getprofilepic($this->input->get('id'));
+            $this->output->set_content_type(get_mime_by_extension($image_path));
+            $this->output->set_output(file_get_contents($image_path));
+        }
+    }
 }
 
 ?>
